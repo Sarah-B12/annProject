@@ -68,7 +68,7 @@ ann.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accura
     # The loss is binary because the output is binary. If it's not we put 'categorical_crossentropy'
 
 # Training the ANN on the Training set
-ann.fit(X_train, y_train, batch_size = 32, epochs = 100) # Epochs is the number of "iteration" for the ANN to learn
+ann.fit(X_train, y_train, batch_size = 16, epochs = 100) # Epochs is the number of "iteration" for the ANN to learn
 
 # MAKING THE PREDICTIONS AND EVALUATING THE MODEL
 # Predicting the result of a single observation
