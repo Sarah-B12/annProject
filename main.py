@@ -17,7 +17,7 @@ def csv_from_excel():
     csv_file.close()
 
 
-# csv_from_excel()
+csv_from_excel()
 
 
 
@@ -73,7 +73,7 @@ ann.fit(X_train, y_train, batch_size = 16, epochs = 100) # Epochs is the number 
 # MAKING THE PREDICTIONS AND EVALUATING THE MODEL
 # Predicting the result of a single observation
 # Use our ANN model to predict if the video with the following informations is violent or not:
-print(ann.predict(sc.transform([[9.03319305383975, 0.123087682462989, 11, 22.3131521917085, 8.58487714081372, 0.0727207471007051, 14, 16.2701927527315]])) > 0.5)
+print(ann.predict(sc.transform([[97.0880982819946, 0.137288326796803, 0.5, 375.10536085933, 102.316417905489, 0.0692592658259288, 0.446666666666667, 362.362828129655]])) > 0.5)
 # The output is the PROBABILITY (because of the sigmoid function) that the video is violent or not
 # So to not have a number at the output, we put the '> 0.5' (if the prob. is >0.5 then we consider the result is 1)
 
@@ -88,4 +88,12 @@ print(np.concatenate((y_pred.reshape(len(y_pred),1), y_test.reshape(len(y_test),
 from sklearn.metrics import confusion_matrix, accuracy_score
 cm = confusion_matrix(y_test, y_pred)
 print(cm)
-accuracy_score(y_test, y_pred) # See the accuracy of the ANN
+accuracy_score(y_test, y_pred)  # See the accuracy of the ANN
+
+
+'''
+[ [Correct non violent    False positive]
+  [False negative  Correct violent] ]
+  
+  [Prediction  True value]
+'''
