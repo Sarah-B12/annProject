@@ -16,7 +16,7 @@ def csv_from_excel():
 
     csv_file.close()
 
-#call the function1
+#call the function
 csv_from_excel()
 
 
