@@ -6,7 +6,7 @@ import csv
 
 
 def csv_from_excel():
-    wb = xlrd.open_workbook('/Users/brownies/Desktop/BA/BIG_Project/ANN/VideosData.xlsx')
+    wb = xlrd.open_workbook('/Users/brownies/Desktop/BA/BIG_Project/ANN/VideosData.xls')
     sh = wb.sheet_by_name('Sheet1')
     csv_file = open('/Users/brownies/Desktop/BA/BIG_Project/ANN/VideosData.csv', 'w')
     wr = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
@@ -31,7 +31,7 @@ y = dataset.iloc[:, -1].values  # Only the last column
 # Splitting the dataset into the Training set and Test set
 from sklearn.model_selection import train_test_split
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=1)
 
 # Feature scaling
 from sklearn.preprocessing import StandardScaler
@@ -46,13 +46,13 @@ X_test = sc.transform(X_test)
 ann = tf.keras.models.Sequential()  # create the ANN
 
 # Adding the input layer and the first hidden layer
-ann.add(tf.keras.layers.Dense(units=8, activation='relu'))  # We put 6 neurons in this hidden layer
+ann.add(tf.keras.layers.Dense(units=22, activation='relu'))  # We put 22 neurons in this hidden layer
                                                             # Relu: rectifier activation function
 
 # Adding the second hidden layer
-ann.add(tf.keras.layers.Dense(units=8, activation='relu'))
+ann.add(tf.keras.layers.Dense(units=22, activation='relu'))
 
-ann.add(tf.keras.layers.Dense(units=8, activation='relu'))
+ann.add(tf.keras.layers.Dense(units=22, activation='relu'))
 
 
 # Adding the output layer (contain what we want to predict)
