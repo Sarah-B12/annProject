@@ -7,10 +7,10 @@ import os
 
 # Function to rename multiple files
 def main():
-    for count, filename in enumerate(os.listdir("C:\\Users\\sgal8\\Desktop\\RWF-2000 Dataset\\Videos\\Test\\Fight")):
+    for count, filename in enumerate(os.listdir("/Users/brownies/Desktop/BA/BIG_Project/Videos/DB/Test/Fight/")):
         dst = str(count) + ".avi"
-        src = 'C:\\Users\\sgal8\\Desktop\\RWF-2000 Dataset\\Videos\\Test\\Fight\\' + filename
-        dst = 'C:\\Users\\sgal8\\Desktop\\RWF-2000 Dataset\\Videos\\Test\\Fight\\' + dst
+        src = '/Users/brownies/Desktop/BA/BIG_Project/Videos/DB/Test/Fight/' + filename
+        dst = '/Users/brownies/Desktop/BA/BIG_Project/Videos/DB/Test/Fight/' + dst
 
         # rename() function will
         # rename all the files
