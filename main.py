@@ -6,9 +6,9 @@ import csv
 
 
 def csv_from_excel():
-    wb = xlrd.open_workbook('/Users/brownies/Desktop/BA/BIG_Project/ANN/VideosData.xls')
+    wb = xlrd.open_workbook('/Users/brownies/Desktop/BA/BIG_Project/ANN/VideoGood.xls')
     sh = wb.sheet_by_name('Sheet1')
-    csv_file = open('/Users/brownies/Desktop/BA/BIG_Project/ANN/VideosData.csv', 'w')
+    csv_file = open('/Users/brownies/Desktop/BA/BIG_Project/ANN/VideoGood.csv', 'w')
     wr = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
 
     for rownum in range(sh.nrows):
@@ -17,13 +17,13 @@ def csv_from_excel():
     csv_file.close()
 
 #call the function
-#csv_from_excel()
+csv_from_excel()
 
 
 
 # DATA PROCESSING
 # Import the CSV file
-dataset = pd.read_csv(r"/Users/brownies/Desktop/BA/BIG_Project/ANN/VideosData.csv")
+dataset = pd.read_csv(r"/Users/brownies/Desktop/BA/BIG_Project/ANN/VideoGood.csv")
 X = dataset.iloc[:, 1:-1].values  # From the 2nd column to the end but not the last column
 y = dataset.iloc[:, -1].values  # Only the last column
 
@@ -31,7 +31,7 @@ y = dataset.iloc[:, -1].values  # Only the last column
 # Splitting the dataset into the Training set and Test set
 from sklearn.model_selection import train_test_split
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
 
 # Feature scaling
 from sklearn.preprocessing import StandardScaler
@@ -46,13 +46,15 @@ X_test = sc.transform(X_test)
 ann = tf.keras.models.Sequential()  # create the ANN
 
 # Adding the input layer and the first hidden layer
-ann.add(tf.keras.layers.Dense(units=22, activation='relu'))  # We put 22 neurons in this hidden layer
+ann.add(tf.keras.layers.Dense(units=100, activation='relu'))  # We put 22 neurons in this hidden layer
                                                             # Relu: rectifier activation function
 
 # Adding the second hidden layer
-ann.add(tf.keras.layers.Dense(units=22, activation='relu'))
+ann.add(tf.keras.layers.Dense(units=100, activation='relu'))
 
-ann.add(tf.keras.layers.Dense(units=22, activation='relu'))
+ann.add(tf.keras.layers.Dense(units=100, activation='relu'))
+ann.add(tf.keras.layers.Dense(units=100, activation='relu'))
+ann.add(tf.keras.layers.Dense(units=100, activation='relu'))
 
 
 # Adding the output layer (contain what we want to predict)
@@ -68,12 +70,12 @@ ann.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accura
     # The loss is binary because the output is binary. If it's not we put 'categorical_crossentropy'
 
 # Training the ANN on the Training set
-ann.fit(X_train, y_train, batch_size = 16, epochs = 100) # Epochs is the number of "iteration" for the ANN to learn
+ann.fit(X_train, y_train, batch_size = 16, epochs = 200) # Epochs is the number of "iteration" for the ANN to learn
 
 # MAKING THE PREDICTIONS AND EVALUATING THE MODEL
 # Predicting the result of a single observation
 # Use our ANN model to predict if the video with the following informations is violent or not:
-print(ann.predict(sc.transform([[97.0880982819946, 0.137288326796803, 0.5, 375.10536085933, 102.316417905489, 0.0692592658259288, 0.446666666666667, 362.362828129655]])) > 0.5)
+print(ann.predict(sc.transform([[0, 0, 0, 0, 0, 0, 0, 0]])) > 0.5)
 # The output is the PROBABILITY (because of the sigmoid function) that the video is violent or not
 # So to not have a number at the output, we put the '> 0.5' (if the prob. is >0.5 then we consider the result is 1)
 
