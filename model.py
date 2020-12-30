@@ -5,7 +5,7 @@ mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
 mp_holistic = mp.solutions.holistic
 
-# For webcam input:
+# For webcam input::
 pose = mp_pose.Pose(
     min_detection_confidence=0.25, min_tracking_confidence=0.25)
 cap = cv2.VideoCapture("data/1.avi")
