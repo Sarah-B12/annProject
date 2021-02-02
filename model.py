@@ -3,12 +3,15 @@ import cv2
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
+mp_pose2 = mp.solutions.pose
 mp_holistic = mp.solutions.holistic
 
-# For webcam input::
+# For webcam input:
 pose = mp_pose.Pose(
     min_detection_confidence=0.25, min_tracking_confidence=0.25)
-cap = cv2.VideoCapture("data/1.avi")
+pose2 = mp_pose2.Pose(
+    min_detection_confidence=0.25, min_tracking_confidence=0.25)
+cap = cv2.VideoCapture(0)
 number_of_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 while cap.isOpened():
   success, image = cap.read()
@@ -24,6 +27,7 @@ while cap.isOpened():
   # pass by reference.
   image.flags.writeable = False
   results = pose.process(image)
+  results2 = pose2.process(image)
 
 
   # Draw the pose annotation on the image.
