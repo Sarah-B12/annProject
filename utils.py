@@ -734,7 +734,7 @@ def run_and_draw_graph_of_speed_and_acc_Pelicus(no_fight_path, fight_path, path_
     plt.legend(loc="upper left")
     plt.show()
     return max_peak_violent, max_peak_non_violent, num_peaks_non_violent, num_peaks_violent
-    #a
+
 
 def Peliculas_results(max_peak_violent, max_peak_non_violent, num_peaks_non_violent, num_peaks_violent):
     length = min(len(max_peak_violent), len(max_peak_non_violent), len(num_peaks_non_violent), len(num_peaks_violent))
