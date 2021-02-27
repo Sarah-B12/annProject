@@ -100,7 +100,7 @@ model.add(Dropout(0.3))
 model.add(Dense(6, activation="softmax"))
 
 model.summary()
-
+'''
 opt = keras.optimizers.SGD(lr=0.001)
 model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=["accuracy"])
 
@@ -115,4 +115,4 @@ y_pred = np.argmax(y_pred, axis=1)
 y_test = np.argmax(y_test, axis=1)
 
 print(classification_report(y_test, y_pred))
-
+'''
