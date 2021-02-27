@@ -20,7 +20,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import multilabel_confusion_matrix
 
 data_dir = "video_data/"
-seq_len = 10
+seq_len = 2
 classes = ["Fight", "NonFight"]
 
 
@@ -110,6 +110,7 @@ callbacks = [earlystop]
 history = model.fit(x=X_train, y=y_train, epochs=40, batch_size=8, shuffle=True, validation_split=0.2,
                     callbacks=callbacks)
 
+y_pred = model.predict(X_test)
 y_pred = np.argmax(y_pred, axis=1)
 y_test = np.argmax(y_test, axis=1)
 
