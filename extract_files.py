@@ -1,100 +1,117 @@
-"""
-We run this one to extract the images from the videos
-and also create a data file we can use
-for training and testing later.
-"""
+import keras
+from keras import applications
+from keras.preprocessing.image import ImageDataGenerator
+from keras import optimizers
+from keras.models import Sequential, Model
+from keras.layers import *
+from keras.callbacks import ModelCheckpoint, LearningRateScheduler, TensorBoard, EarlyStopping
 
-import csv
-import glob
 import os
-import os.path
-import sys
-from subprocess import call
+import cv2
+import numpy as np
+from sklearn.model_selection import train_test_split
 
-def extract_files(extenssion='avi'):
-    """After we have all of our videos split between train and test, and
-    all nested within folders representing their classes, we need to
-    make a data file that we can reference when training our RNN(s).
-    This will let us keep track of image sequences and other parts
-    of the training process.
-    We'll first need to extract images from each of the videos. We'll
-    need to record the following data in the file:
-    [train|test], class, filename, nb frames
-    Extracting can be done with ffmpeg:
-    `ffmpeg -i video.mpg image-%04d.jpg`
-    """
-    data_file = []
-    folders = ['train', 'test']
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import multilabel_confusion_matrix
 
-    for folder in folders:
-        class_folders = glob.glob(os.path.join(folder, '*'))
+data_dir = "video_data/"
+seq_len = 10
+classes = ["Fight", "NonFight"]
 
-        for vid_class in class_folders:
-            class_files = glob.glob(os.path.join(vid_class, '*.' + extenssion))
 
-            for video_path in class_files:
-                # Get the parts of the file.
-                video_parts = get_video_parts(video_path)
+#  Creating frames from videos
 
-                train_or_test, classname, filename_no_ext, filename = video_parts
+def frames_extraction(video_path, min_img_height, min_img_width):
+    frames_list = []
 
-                # Only extract if we haven't done it yet. Otherwise, just get
-                # the info.
-                if not check_already_extracted(video_parts):
-                    # Now extract it.
-                    src = os.path.join(train_or_test, classname, filename)
-                    dest = os.path.join(train_or_test, classname,
-                        filename_no_ext + '-%04d.jpg')
-                    call(["ffmpeg", "-i", src, dest])
+    vidObj = cv2.VideoCapture(video_path)
+    # Used as counter variable
+    count = 1
 
-                # Now get how many frames it is.
-                nb_frames = get_nb_frames_for_video(video_parts)
+    while count <= seq_len:
+        success, image = vidObj.read()
+        # cv2.imwrite("frame%d.jpg" % count, image)
+        img_height, img_width, channels = image.shape
+        if img_height < min_img_height:
+            min_img_height = img_height
+        if img_width < min_img_width:
+            min_img_width = img_width
+        if success:
+            image = cv2.resize(image, (img_height, img_width))
+            frames_list.append(image)
+            count += 1
+        else:
+            print("Defected frame")
+            break
 
-                data_file.append([train_or_test, classname, filename_no_ext, nb_frames])
+    return frames_list, min_img_height, min_img_width
 
-                print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
 
-    with open('data_file.csv', 'w') as fout:
-        writer = csv.writer(fout)
-        writer.writerows(data_file)
+def create_data(input_dir, min_img_height, min_img_width):
+    X = []
+    Y = []
 
-    print("Extracted and wrote %d video files." % (len(data_file)))
+    classes_list = os.listdir(input_dir)
+    classes_list.remove(".DS_Store")
+    counter = 1
+    for c in classes_list:
+        print(c)
+        files_list = os.listdir(os.path.join(input_dir, c))
+        files_list.remove(".DS_Store")
+        for f in files_list:
+            frames, img_height, img_width = frames_extraction(os.path.join(os.path.join(input_dir, c), f), min_img_height, min_img_width)
+            '''
+            for ff in frames:
+                cv2.imwrite("frame%d.jpg" % counter, ff)
+                counter += 1
+            '''
+            if len(frames) == seq_len:
+                X.append(frames)
 
-def get_nb_frames_for_video(video_parts):
-    """Given video parts of an (assumed) already extracted video, return
-    the number of frames that were extracted."""
-    train_or_test, classname, filename_no_ext, _ = video_parts
-    generated_files = glob.glob(os.path.join(train_or_test, classname,
-                                filename_no_ext + '*.jpg'))
-    return len(generated_files)
+                y = [0] * len(classes)
+                y[classes.index(c)] = 1
+                Y.append(y)
 
-def get_video_parts(video_path):
-    """Given a full path to a video, return its parts."""
-    parts = video_path.split(os.path.sep)
-    filename = parts[2]
-    filename_no_ext = filename.split('.')[0]
-    classname = parts[1]
-    train_or_test = parts[0]
+    X = np.asarray(X)
+    Y = np.asarray(Y)
+    return X, Y, img_height, img_width
 
-    return train_or_test, classname, filename_no_ext, filename
 
-def check_already_extracted(video_parts):
-    """Check to see if we created the -0001 frame of this file."""
-    train_or_test, classname, filename_no_ext, _ = video_parts
-    return bool(os.path.exists(os.path.join(train_or_test, classname,
-                               filename_no_ext + '-0001.jpg')))
+min_img_height = 10000
+min_img_width = 10000
 
-def main():
-    """
-    Extract images from videos and build a new file that we
-    can use as our data input file. It can have format:
-    [train|test], class, filename, nb frames
-    """
-    if (len(sys.argv) == 2):
-        extract_files(sys.argv[1])
-    else:
-        print ("Usage: python extract_filese.py [videos extession]")
-        print ("Example: python extract_files.py mp4")
 
-if __name__ == '__main__':
-    main()
+X, Y, img_height, img_width = create_data(data_dir, min_img_height, min_img_width)
+
+X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, shuffle=True, random_state=0)
+
+model = Sequential()
+model.add(ConvLSTM2D(filters=64, kernel_size=(3, 3), return_sequences=False, data_format="channels_last",
+                     input_shape=(seq_len, img_height, img_width, 3)))
+model.add(Dropout(0.2))
+model.add(Flatten())
+model.add(Dense(256, activation="relu"))
+model.add(Dropout(0.3))
+model.add(Dense(6, activation="softmax"))
+
+model.summary()
+
+opt = keras.optimizers.SGD(lr=0.001)
+model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=["accuracy"])
+
+earlystop = EarlyStopping(patience=7)
+callbacks = [earlystop]
+
+history = model.fit(x=X_train, y=y_train, epochs=40, batch_size=8, shuffle=True, validation_split=0.2,
+                    callbacks=callbacks)
+
+y_pred = np.argmax(y_pred, axis=1)
+y_test = np.argmax(y_test, axis=1)
+
+print(classification_report(y_test, y_pred))
+
