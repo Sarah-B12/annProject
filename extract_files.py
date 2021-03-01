@@ -97,7 +97,7 @@ model.add(Dense(2, activation="sigmoid"))
 model.summary()
 
 opt = keras.optimizers.SGD(lr=0.001)
-model.compile(loss='binary_crossentropy', optimizer=opt, metrics=["accuracy"]) #maybe loss='categorical_crossentropy'
+model.compile(loss='binary_crossentropy', optimizer=opt, metrics=["accuracy"]) #maybe loss='categorical_crossentropy'w
 
 earlystop = EarlyStopping(patience=7)
 callbacks = [earlystop]
