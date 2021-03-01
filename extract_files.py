@@ -19,7 +19,7 @@ from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import multilabel_confusion_matrix
 
-data_dir = "data/"
+data_dir = "video_data/"
 seq_len = 70
 classes = ["Fight", "NonFight"]
 img_height, img_width = 64, 64
@@ -52,12 +52,12 @@ def create_data(input_dir):
     Y = []
 
     classes_list = os.listdir(input_dir)
-    #classes_list.remove(".DS_Store")
+    classes_list.remove(".DS_Store")
     counter = 1
     for c in classes_list:
         print(c)
         files_list = os.listdir(os.path.join(input_dir, c))
-        #files_list.remove(".DS_Store")
+        files_list.remove(".DS_Store")
         for f in files_list:
             frames = frames_extraction(os.path.join(os.path.join(input_dir, c), f))
 
