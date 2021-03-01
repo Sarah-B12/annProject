@@ -19,14 +19,14 @@ from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import multilabel_confusion_matrix
 
-data_dir = "video_data/"
-seq_len = 2
+data_dir = "data/"
+seq_len = 70
 classes = ["Fight", "NonFight"]
-
+img_height, img_width = 64, 64
 
 #  Creating frames from videos
 
-def frames_extraction(video_path, min_img_height, min_img_width):
+def frames_extraction(video_path):
     frames_list = []
 
     vidObj = cv2.VideoCapture(video_path)
@@ -34,13 +34,8 @@ def frames_extraction(video_path, min_img_height, min_img_width):
     count = 1
 
     while count <= seq_len:
+
         success, image = vidObj.read()
-        # cv2.imwrite("frame%d.jpg" % count, image)
-        img_height, img_width, channels = image.shape
-        if img_height < min_img_height:
-            min_img_height = img_height
-        if img_width < min_img_width:
-            min_img_width = img_width
         if success:
             image = cv2.resize(image, (img_height, img_width))
             frames_list.append(image)
@@ -49,27 +44,29 @@ def frames_extraction(video_path, min_img_height, min_img_width):
             print("Defected frame")
             break
 
-    return frames_list, min_img_height, min_img_width
+    return frames_list
 
 
-def create_data(input_dir, min_img_height, min_img_width):
+def create_data(input_dir):
     X = []
     Y = []
 
     classes_list = os.listdir(input_dir)
-    classes_list.remove(".DS_Store")
+    #classes_list.remove(".DS_Store")
     counter = 1
     for c in classes_list:
         print(c)
         files_list = os.listdir(os.path.join(input_dir, c))
-        files_list.remove(".DS_Store")
+        #files_list.remove(".DS_Store")
         for f in files_list:
-            frames, img_height, img_width = frames_extraction(os.path.join(os.path.join(input_dir, c), f), min_img_height, min_img_width)
+            frames = frames_extraction(os.path.join(os.path.join(input_dir, c), f))
+
             '''
             for ff in frames:
                 cv2.imwrite("frame%d.jpg" % counter, ff)
                 counter += 1
             '''
+
             if len(frames) == seq_len:
                 X.append(frames)
 
@@ -79,14 +76,12 @@ def create_data(input_dir, min_img_height, min_img_width):
 
     X = np.asarray(X)
     Y = np.asarray(Y)
-    return X, Y, img_height, img_width
+    return X, Y
 
 
-min_img_height = 10000
-min_img_width = 10000
 
 
-X, Y, img_height, img_width = create_data(data_dir, min_img_height, min_img_width)
+X, Y  = create_data(data_dir)
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, shuffle=True, random_state=0)
 
@@ -97,22 +92,23 @@ model.add(Dropout(0.2))
 model.add(Flatten())
 model.add(Dense(256, activation="relu"))
 model.add(Dropout(0.3))
-model.add(Dense(6, activation="softmax"))
+model.add(Dense(2, activation="sigmoid"))
 
 model.summary()
-'''
+
 opt = keras.optimizers.SGD(lr=0.001)
-model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=["accuracy"])
+model.compile(loss='binary_crossentropy', optimizer=opt, metrics=["accuracy"]) #maybe loss='categorical_crossentropy'
 
 earlystop = EarlyStopping(patience=7)
 callbacks = [earlystop]
 
-history = model.fit(x=X_train, y=y_train, epochs=40, batch_size=8, shuffle=True, validation_split=0.2,
-                    callbacks=callbacks)
+
+history = model.fit(x=X_train, y=y_train, epochs=40, batch_size=8, shuffle=True, validation_split=0.2, callbacks=callbacks)
+
 
 y_pred = model.predict(X_test)
 y_pred = np.argmax(y_pred, axis=1)
 y_test = np.argmax(y_test, axis=1)
 
 print(classification_report(y_test, y_pred))
-'''
+
