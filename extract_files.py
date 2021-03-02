@@ -20,7 +20,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import multilabel_confusion_matrix
 
 data_dir = "video_data/"
-seq_len = 70
+seq_len = 150
 classes = ["Fight", "NonFight"]
 img_height, img_width = 64, 64
 
@@ -36,9 +36,11 @@ def frames_extraction(video_path):
     while count <= seq_len:
 
         success, image = vidObj.read()
-        if success:
+        if success and (count % 2) == 0:
             image = cv2.resize(image, (img_height, img_width))
             frames_list.append(image)
+            count += 1
+        elif (count % 2) != 0:
             count += 1
         else:
             print("Defected frame")
@@ -84,6 +86,7 @@ def create_data(input_dir):
 X, Y  = create_data(data_dir)
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, shuffle=True, random_state=0)
+ # TODO : All undecidable = test
 
 model = Sequential()
 model.add(ConvLSTM2D(filters=64, kernel_size=(3, 3), return_sequences=False, data_format="channels_last",
