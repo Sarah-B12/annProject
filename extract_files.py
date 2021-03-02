@@ -69,7 +69,7 @@ def create_data(input_dir):
                 counter += 1
             '''
 
-            if len(frames) == seq_len:
+            if len(frames) == seq_len/2:
                 X.append(frames)
 
                 y = [0] * len(classes)
@@ -90,7 +90,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, shuffl
 
 model = Sequential()
 model.add(ConvLSTM2D(filters=64, kernel_size=(3, 3), return_sequences=False, data_format="channels_last",
-                     input_shape=(seq_len, img_height, img_width, 3)))
+                     input_shape=(seq_len/2, img_height, img_width, 3)))
 model.add(Dropout(0.2))
 model.add(Flatten())
 model.add(Dense(256, activation="relu"))
