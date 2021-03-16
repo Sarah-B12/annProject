@@ -1,10 +1,10 @@
 import os
 
 def main():
-    i = 0
-    path = "/Users/brownies/Desktop/BA/BIG_Project/Videos/DB/Test/Fight/"
+    i = 801
+    path = "C://Users/sgal8/PycharmProjects/starting project/data/PeliculasChinaTest/noFights/"
     for filename in os.listdir(path):
-        my_dest = "TE_Fight_" + str(i) + ".avi"
+        my_dest = str(i) + ".avi"
         my_source = path + filename
         my_dest = path + my_dest
         os.rename(my_source, my_dest)
